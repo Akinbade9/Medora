@@ -1,6 +1,6 @@
 # Medora
 
-Phase 1 foundation only. [The Medora specification](docs/MEDORA_SPEC.md) is the source of truth. Later phases require separate implementation work.
+Phase 1 foundation and Phase 2 design system/base layouts. [The Medora specification](docs/MEDORA_SPEC.md) is the source of truth. Later phases require separate implementation work.
 
 ## Workspace
 
@@ -40,7 +40,15 @@ npm.cmd run dev:mobile
 
 - API: <http://127.0.0.1:3000/api/health>
 - Web: <http://127.0.0.1:5173>
-- Mobile: scan the terminal QR code with compatible Expo Go, or press `a` for an installed Android emulator. Device and computer should share a network. No API connection is needed by the Phase 1 placeholders.
+- Mobile: scan the terminal QR code with compatible Expo Go, or press `a` for an installed Android emulator. Device and computer should share a network. No API connection is needed by the layout previews.
+
+## Phase 2 layout previews
+
+On the web, the **Preview workspace** selector switches between Doctor, Pharmacy, and Platform Admin layouts. Sidebar links navigate to placeholder screens; **UI components** opens the interactive design-system gallery. The doctor's **+ New Prescription** action and header notification bell open preview dialogs. Hash URLs support refresh and browser back/forward, for example `/#/doctor/patients` and `/#/admin/medicine-catalogue`.
+
+The patient app has Home, Prescriptions, Orders, and Profile bottom tabs. Notifications open from the header bell. All navigation is local UI state; no clinical or account data is connected.
+
+Theme tokens live in `apps/web-dashboard/src/theme.css` and `apps/patient-mobile/src/theme.ts`. Both platforms bundle Inter locally. See [the Phase 2 report](docs/PHASE2_REPORT.md) for the complete file list, dependency rationale, and verification limits.
 
 `GET /api/health` returns HTTP 200:
 
@@ -73,6 +81,6 @@ npm.cmd exec --workspace @medora/patient-mobile -- expo export --platform androi
 
 Generated `dist`, Expo caches, dependencies, local environment files, and credentials are ignored by Git. Shared types are type-only; validation intentionally has no runtime/domain implementation yet.
 
-## Phase 1 limits
+## Current scope and limits
 
-The web and mobile apps contain only a welcome screen. Authentication, databases, prescriptions, pharmacy operations, matching, payments, the design system, and all other later-phase features are not implemented. Mobile JavaScript bundling and Metro startup do not replace testing on a real device or emulator. No native app binaries are built in this phase.
+The web and mobile apps contain navigable layout previews and the base design system. Authentication, databases, prescriptions, pharmacy operations, matching, payments, and all other later-phase features are not implemented. Mobile JavaScript bundling and Metro startup do not replace testing on a real device or emulator. No native app binaries are built in this phase.
