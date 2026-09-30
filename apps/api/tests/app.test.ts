@@ -2,8 +2,10 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import express from 'express';
 import request from 'supertest';
-import { app } from '../src/app.js';
+import { createApp } from '../src/app.js';
+import { testConfig } from './config.js';
 import { errorHandler } from '../src/middleware/error-handler.js';
+const app = createApp(testConfig);
 
 test('health endpoint returns successful JSON', async () => {
   const response = await request(app)

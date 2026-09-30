@@ -21,6 +21,7 @@ import {
   X,
 } from 'lucide-react-native';
 import { theme } from './theme';
+import type { PublicUser } from '@medora/shared-types';
 
 const tabs = [
   { name: 'Home', icon: Home },
@@ -30,7 +31,7 @@ const tabs = [
 ] as const;
 type TabName = (typeof tabs)[number]['name'];
 export const FontReadyContext = createContext(true);
-function AppText({
+export function AppText({
   weight = 'regular',
   style,
   ...props
@@ -48,7 +49,15 @@ function AppText({
   );
 }
 
-export function PatientLayout() {
+export function PatientLayout({
+  user,
+  onLogout,
+  signingOut,
+}: {
+  user: PublicUser;
+  onLogout: () => void;
+  signingOut: boolean;
+}) {
   const [activeTab, setActiveTab] = useState<TabName>('Home');
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
@@ -91,7 +100,7 @@ export function PatientLayout() {
       >
         <View style={styles.intro}>
           <AppText weight="semibold" style={styles.eyebrow}>
-            YOUR MEDORA
+            {user.displayName}'s MEDORA
           </AppText>
           <AppText
             accessibilityRole="header"
@@ -209,6 +218,18 @@ export function PatientLayout() {
               </AppText>
             </Pressable>
           </View>
+        )}
+        {activeTab === 'Profile' && (
+          <Pressable
+            accessibilityRole="button"
+            disabled={signingOut}
+            style={styles.secondaryButton}
+            onPress={onLogout}
+          >
+            <AppText weight="semibold" style={styles.secondaryButtonText}>
+              {signingOut ? 'Signing out…' : 'Sign out'}
+            </AppText>
+          </Pressable>
         )}
         <View style={styles.previewBadge}>
           <AppText weight="medium" style={styles.previewText}>

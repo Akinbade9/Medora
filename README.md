@@ -1,6 +1,6 @@
 # Medora
 
-Phase 1 foundation and Phase 2 design system/base layouts. [The Medora specification](docs/MEDORA_SPEC.md) is the source of truth. Later phases require separate implementation work.
+Phases 1–3: project foundation, design system/base layouts, and authentication/RBAC. [The Medora specification](docs/MEDORA_SPEC.md) is the source of truth. Later phases require separate implementation work.
 
 ## Workspace
 
@@ -16,6 +16,7 @@ Phase 1 foundation and Phase 2 design system/base layouts. [The Medora specifica
 ## Requirements and installation
 
 - Node.js 22.13+ in the 22.x line, or Node.js 24.3+; npm 10+.
+- A running MongoDB instance or MongoDB connection URI for the User and AuthSession collections. Tests start a separate disposable MongoDB instance automatically.
 - Expo Go compatible with SDK 57 on a device, or an Android emulator, to view the mobile app. The iOS simulator requires macOS and Xcode.
 
 Run commands from the repository root. On Windows PowerShell use `npm.cmd` (as below) if execution policy blocks `npm.ps1`. On other shells, `npm` works instead.
@@ -24,7 +25,7 @@ Run commands from the repository root. On Windows PowerShell use `npm.cmd` (as b
 npm.cmd ci
 ```
 
-No secrets, external services, or environment files are required. To override API defaults, copy `apps/api/.env.example` to `apps/api/.env`. The API loads that file when launched using the workspace commands. Default settings: `HOST=127.0.0.1`, `PORT=3000`, `NODE_ENV=development`.
+Copy `apps/api/.env.example` to `apps/api/.env` unless that file already exists, then set `MONGODB_URI` and `JWT_ACCESS_SECRET`. Generate a signing secret with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` and paste its 64-character value into the API `.env`. Do not commit it. The API fails closed if required configuration is missing or MongoDB is unavailable. Default network settings are `HOST=127.0.0.1`, `PORT=3000`, and `NODE_ENV=development`.
 
 Each app has an `.env.example`. Vite's `VITE_*` and Expo's `EXPO_PUBLIC_*` values are included in client bundles and must never contain secrets. The root `.env.example` documents where app settings belong.
 
@@ -40,15 +41,27 @@ npm.cmd run dev:mobile
 
 - API: <http://127.0.0.1:3000/api/health>
 - Web: <http://127.0.0.1:5173>
-- Mobile: scan the terminal QR code with compatible Expo Go, or press `a` for an installed Android emulator. Device and computer should share a network. No API connection is needed by the layout previews.
+- Mobile: scan the terminal QR code with compatible Expo Go, or press `a` for an installed Android emulator. Press `w` for the patient app's web rendering. Authentication requires the API. For a physical device, set `EXPO_PUBLIC_API_URL` to your computer's LAN address and configure the API's `HOST=0.0.0.0` on your trusted development network. Android emulators normally reach the host using `10.0.2.2`.
 
-## Phase 2 layout previews
+## Sign in and navigate
 
-On the web, the **Preview workspace** selector switches between Doctor, Pharmacy, and Platform Admin layouts. Sidebar links navigate to placeholder screens; **UI components** opens the interactive design-system gallery. The doctor's **+ New Prescription** action and header notification bell open preview dialogs. Hash URLs support refresh and browser back/forward, for example `/#/doctor/patients` and `/#/admin/medicine-catalogue`.
+The web and patient apps open with login/registration screens. Registration always creates a `PATIENT`; submitted role fields are rejected. A trusted operator can assign a professional role to an existing account using the backend-only command below. This command requires the API's database configuration and revokes that user's existing sessions.
 
-The patient app has Home, Prescriptions, Orders, and Profile bottom tabs. Notifications open from the header bell. All navigation is local UI state; no clinical or account data is connected.
+```powershell
+npm.cmd run user:role --workspace @medora/api -- account@example.com DOCTOR
+```
+
+Supported roles are `PATIENT`, `DOCTOR`, `PHARMACY_ADMIN`, `PHARMACY_STAFF`, and `PLATFORM_ADMIN`. There are no seeded accounts or default passwords.
+
+Web login routes doctors to Doctor, pharmacy roles to Pharmacy, and platform admins to Admin. The old role preview selector is removed; manually changing the hash cannot select another role's layout. Patient users continue to the Expo patient app's web rendering at `VITE_PATIENT_APP_URL`. Keep the browser apps and API on the same site (including a consistent hostname and scheme) for HttpOnly cookie sessions. Native patient login opens the patient layout; professional users continue to the web dashboard and sign in there again without passing credentials in URLs.
+
+Sidebar links still open placeholder screens. **UI components** opens the component gallery. **+ New Prescription** and notifications remain preview dialogs. Hash URLs support refresh and browser back/forward within the authenticated role's workspace.
+
+The patient app has Home, Prescriptions, Orders, and Profile bottom tabs. Notifications open from the header bell. Sign out is available in the web header and patient Profile tab. User authentication is connected; clinical screens remain placeholders.
 
 Theme tokens live in `apps/web-dashboard/src/theme.css` and `apps/patient-mobile/src/theme.ts`. Both platforms bundle Inter locally. See [the Phase 2 report](docs/PHASE2_REPORT.md) for the complete file list, dependency rationale, and verification limits.
+
+See [the Phase 3 report](docs/PHASE3_REPORT.md) for auth endpoint contracts, token storage/rotation, environment variables, new dependencies, the exact change list, and verification limits.
 
 `GET /api/health` returns HTTP 200:
 
@@ -65,7 +78,7 @@ npm.cmd run check
 npm.cmd run build
 ```
 
-`check` runs ESLint, Prettier verification, TypeScript checks for all five workspaces, and the initial API integration tests. Tests cover health, unknown routes, malformed JSON, body limits, and unexpected errors. Individual commands are `lint`, `format:check`, `typecheck`, and `test`; `format` applies formatting.
+`check` runs ESLint, Prettier verification, TypeScript checks for all five workspaces, and API integration tests. Tests cover health/error responses plus registration, login, all five roles, password redaction, JWT validation, refresh rotation/reuse/concurrency, CSRF/cookies, ownership, rate limiting, expiry, and logout. The first test run downloads a MongoDB test binary; it does not use your configured database or `.env`. Individual commands are `lint`, `format:check`, `typecheck`, and `test`; `format` applies formatting.
 
 `build` compiles the API and produces the Vite bundle. To start the built API:
 
@@ -83,4 +96,4 @@ Generated `dist`, Expo caches, dependencies, local environment files, and creden
 
 ## Current scope and limits
 
-The web and mobile apps contain navigable layout previews and the base design system. Authentication, databases, prescriptions, pharmacy operations, matching, payments, and all other later-phase features are not implemented. Mobile JavaScript bundling and Metro startup do not replace testing on a real device or emulator. No native app binaries are built in this phase.
+Authentication and RBAC are implemented using only User and AuthSession MongoDB models. Patient, Doctor, Hospital, Pharmacy, prescriptions, inventory, matching, payments, and other later-phase domain features are not implemented. Email verification, password reset, and MFA are not included. Mobile JavaScript bundling and Metro startup do not replace testing on a real device or emulator. No native app binaries are built in this phase.

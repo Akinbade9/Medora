@@ -1,5 +1,6 @@
 import type { ErrorRequestHandler } from 'express';
 import type { ApiErrorResponse } from '@medora/shared-types';
+import { AuthError } from '../auth/validation.js';
 
 export const errorHandler: ErrorRequestHandler = (
   error: unknown,
@@ -26,10 +27,12 @@ export const errorHandler: ErrorRequestHandler = (
 
   // Never expose exception messages, stack traces, or request bodies to clients.
   const message =
-    status === 500
-      ? 'Internal server error'
-      : status === 413
-        ? 'Request body too large'
-        : 'Invalid request';
+    error instanceof AuthError
+      ? error.message
+      : status === 500
+        ? 'Internal server error'
+        : status === 413
+          ? 'Request body too large'
+          : 'Invalid request';
   res.status(status).json({ error: { message } } satisfies ApiErrorResponse);
 };

@@ -1,0 +1,47 @@
+.auth-page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+}
+.auth-card {
+  width: 100%;
+  max-width: 28rem;
+  padding: var(--space-8);
+}
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-primary);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: var(--space-8);
+}
+.auth-card h1 {
+  margin-bottom: var(--space-3);
+}
+.auth-switch {
+  width: 100%;
+  margin-top: var(--space-5);
+}
+.session-message {
+  max-width: 36rem;
+  margin: var(--space-8) auto;
+  padding: var(--space-6);
+}
+.account-name {
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-xs);
+}
+@media (max-width: 560px) {
+  .account-name {
+    display: none;
+  }
+  .auth-card {
+    padding: var(--space-6);
+  }
+}

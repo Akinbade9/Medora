@@ -8,17 +8,22 @@ import {
   Plus,
   Shapes,
 } from 'lucide-react';
-import { Badge, Button, EmptyState, Modal, Select } from '../components/ui';
+import { Badge, Button, EmptyState, Modal } from '../components/ui';
+import type { PublicUser } from '@medora/shared-types';
 import { workspaces } from './navigation';
 import type { WorkspaceRole } from './navigation';
 export function DashboardLayout({
   role,
   page,
   children,
+  user,
+  onLogout,
 }: {
   role: WorkspaceRole;
   page: string;
   children: ReactNode;
+  user: PublicUser;
+  onLogout: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dialog, setDialog] = useState<'notifications' | 'prescription' | null>(
@@ -116,20 +121,10 @@ export function DashboardLayout({
             <span>{pageLabel}</span>
           </div>
           <div className="header-actions">
-            <Select
-              label="Preview workspace"
-              value={role}
-              onChange={(event) => {
-                const next = event.target.value as WorkspaceRole;
-                window.location.hash = `/${next}/${workspaces[next].items[0]!.id}`;
-                setMenuOpen(false);
-              }}
-              className="workspace-select"
-            >
-              <option value="doctor">Doctor</option>
-              <option value="pharmacy">Pharmacy</option>
-              <option value="admin">Platform Admin</option>
-            </Select>
+            <span className="account-name">{user.displayName}</span>
+            <Button variant="secondary" onClick={onLogout}>
+              Sign out
+            </Button>
             <Button
               variant="ghost"
               className="icon-button notification-button"
