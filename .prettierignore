@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+.expo/
+.tmp/
+.npm-cache/
+package-lock.json
+docs/MEDORA_SPEC.md

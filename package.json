@@ -1,0 +1,38 @@
+{
+  "name": "medora",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.13.0 <23 || >=24.3.0",
+    "npm": ">=10"
+  },
+  "scripts": {
+    "dev:api": "npm run dev --workspace @medora/api",
+    "dev:web": "npm run dev --workspace @medora/web-dashboard",
+    "dev:mobile": "npm run start --workspace @medora/patient-mobile",
+    "build": "npm run build --workspace @medora/api && npm run build --workspace @medora/web-dashboard",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.19.0",
+    "eslint": "^10.11.0",
+    "eslint-config-prettier": "^10.1.0",
+    "eslint-plugin-react-hooks": "^7.0.0",
+    "globals": "^17.0.0",
+    "prettier": "^3.8.0",
+    "tsx": "^4.21.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.57.0"
+  }
+}
