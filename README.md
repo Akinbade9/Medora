@@ -1,6 +1,6 @@
 # Medora
 
-Phases 1–3: project foundation, design system/base layouts, and authentication/RBAC. [The Medora specification](docs/MEDORA_SPEC.md) is the source of truth. Later phases require separate implementation work.
+Phases 1–4: project foundation, design system/base layouts, authentication/RBAC, and core domain models. [The Medora specification](docs/MEDORA_SPEC.md) is the source of truth. Later phases require separate implementation work.
 
 ## Workspace
 
@@ -16,7 +16,7 @@ Phases 1–3: project foundation, design system/base layouts, and authentication
 ## Requirements and installation
 
 - Node.js 22.13+ in the 22.x line, or Node.js 24.3+; npm 10+.
-- A running MongoDB instance or MongoDB connection URI for the User and AuthSession collections. Tests start a separate disposable MongoDB instance automatically.
+- A running MongoDB instance or MongoDB connection URI for authentication and core domain collections. Tests start a separate disposable MongoDB instance automatically.
 - Expo Go compatible with SDK 57 on a device, or an Android emulator, to view the mobile app. The iOS simulator requires macOS and Xcode.
 
 Run commands from the repository root. On Windows PowerShell use `npm.cmd` (as below) if execution policy blocks `npm.ps1`. On other shells, `npm` works instead.
@@ -51,7 +51,7 @@ The web and patient apps open with login/registration screens. Registration alwa
 npm.cmd run user:role --workspace @medora/api -- account@example.com DOCTOR
 ```
 
-Supported roles are `PATIENT`, `DOCTOR`, `PHARMACY_ADMIN`, `PHARMACY_STAFF`, and `PLATFORM_ADMIN`. There are no seeded accounts or default passwords.
+Supported roles are `PATIENT`, `DOCTOR`, `PHARMACY_ADMIN`, `PHARMACY_STAFF`, and `PLATFORM_ADMIN`. Role assignment rejects changes that conflict with an existing Patient, Doctor, or Pharmacy administrator relationship. No accounts or default passwords are created automatically.
 
 Web login routes doctors to Doctor, pharmacy roles to Pharmacy, and platform admins to Admin. The old role preview selector is removed; manually changing the hash cannot select another role's layout. Patient users continue to the Expo patient app's web rendering at `VITE_PATIENT_APP_URL`. Keep the browser apps and API on the same site (including a consistent hostname and scheme) for HttpOnly cookie sessions. Native patient login opens the patient layout; professional users continue to the web dashboard and sign in there again without passing credentials in URLs.
 
@@ -92,8 +92,20 @@ To verify native JavaScript bundling without an emulator:
 npm.cmd exec --workspace @medora/patient-mobile -- expo export --platform android --platform ios
 ```
 
-Generated `dist`, Expo caches, dependencies, local environment files, and credentials are ignored by Git. Shared types are type-only; validation intentionally has no runtime/domain implementation yet.
+Generated `dist`, Expo caches, dependencies, local environment files, and credentials are ignored by Git. Shared types are type-only; domain validation lives in the API's Mongoose schemas. The shared validation workspace remains a placeholder.
+
+## Core models and development seed
+
+Patient, Doctor, Hospital, and Pharmacy models include validated relationships, indexes, and verification statuses. They have no public CRUD or verification workflow yet. See [the Phase 4 report](docs/PHASE4_REPORT.md) for field contracts, validation boundaries, tests, and all changed files.
+
+To add fictional development records, point `MONGODB_URI` in `apps/api/.env` at a dedicated development database, keep `NODE_ENV=development`, and set `SEED_PASSWORD` to a unique password of 12–128 characters. Then run:
+
+```powershell
+npm.cmd run seed:dev --workspace @medora/api
+```
+
+The seed creates `patient@medora.example.test`, `doctor@medora.example.test`, `pharmacy@medora.example.test`, and `admin@medora.example.test`, plus one patient profile, doctor profile, hospital, and pharmacy. All accounts initially use your supplied seed password, hashed using the existing authentication implementation. Reruns preserve existing passwords and edits. Professional verification statuses remain `PENDING`. This is a development fixture, not an account-provisioning or verification workflow. Remove `SEED_PASSWORD` from the environment after use.
 
 ## Current scope and limits
 
-Authentication and RBAC are implemented using only User and AuthSession MongoDB models. Patient, Doctor, Hospital, Pharmacy, prescriptions, inventory, matching, payments, and other later-phase domain features are not implemented. Email verification, password reset, and MFA are not included. Mobile JavaScript bundling and Metro startup do not replace testing on a real device or emulator. No native app binaries are built in this phase.
+Authentication/RBAC and the four core domain models are implemented. Prescriptions, medicine catalogue, inventory, matching, payments, and admin verification workflows are not implemented. Email verification, password reset, and MFA are not included. Registration still creates only a User; collecting and creating role profiles requires later workflows. Model verification statuses do not change the existing authentication rules. Mobile JavaScript bundling and Metro startup do not replace testing on a real device or emulator. No native app binaries are built in this phase.

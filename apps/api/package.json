@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "test": "tsx --test tests/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "user:role": "tsx src/auth/set-role.ts"
+    "user:role": "tsx src/auth/set-role.ts",
+    "seed:dev": "tsx src/domain/seed.ts"
   },
   "dependencies": {
     "@medora/shared-types": "*",

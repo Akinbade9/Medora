@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { createApp } from './app.js';
 import { loadAuthConfig } from './auth/config.js';
 import { AuthSession, User } from './auth/models.js';
+import { initializeDomainModels } from './domain/index.js';
 
 const port = Number(process.env.PORT ?? 3000);
 const host = process.env.HOST ?? '127.0.0.1';
@@ -13,7 +14,11 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
 async function start() {
   const config = loadAuthConfig();
   await mongoose.connect(config.mongoUri, { serverSelectionTimeoutMS: 5000 });
-  await Promise.all([User.init(), AuthSession.init()]);
+  await Promise.all([
+    User.init(),
+    AuthSession.init(),
+    initializeDomainModels(),
+  ]);
   const server = createApp(config).listen(port, host, () => {
     console.log(`Medora API listening at http://${host}:${port}`);
   });
