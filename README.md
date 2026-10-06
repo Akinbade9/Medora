@@ -1,6 +1,6 @@
 # Medora
 
-Phases 1–5: project foundation, design system/base layouts, authentication/RBAC, core domain models, and medicine catalogue. [The Medora specification](docs/MEDORA_SPEC.md) is the source of truth. Later phases require separate implementation work.
+Phases 1–6: project foundation, design system/base layouts, authentication/RBAC, core domain models, medicine catalogue, and the backend prescription engine. [The Medora specification](docs/MEDORA_SPEC.md) is the source of truth. Later phases require separate implementation work.
 
 ## Workspace
 
@@ -108,7 +108,13 @@ The seed creates `patient@medora.example.test`, `doctor@medora.example.test`, `p
 
 ## Current scope and limits
 
-Authentication/RBAC, core domain models, and backend medicine catalogue are implemented. Prescriptions, inventory, matching, payments, and admin verification workflows are not implemented. Email verification, password reset, and MFA are not included. Registration still creates only a User; collecting and creating role profiles requires later workflows. Model verification statuses do not change the existing authentication rules. Mobile JavaScript bundling and Metro startup do not replace testing on a real device or emulator. No native app binaries are built in this phase.
+Authentication/RBAC, core domain models, backend medicine catalogue, and backend prescription issuance/viewing/cancellation are implemented. Prescription UI, inventory, matching, reservations, orders, payments, and admin verification workflows are not implemented. Email verification, password reset, and MFA are not included. Registration still creates only a User; collecting and creating role profiles requires later workflows. Doctor verification is required for prescription issuance. Mobile JavaScript bundling and Metro startup do not replace testing on a real device or emulator. No native app binaries are built in this phase.
+
+## Prescription engine
+
+Verified doctors can issue prescriptions and list/read/cancel their own eligible records. Patients can list/view only their own prescriptions. Issued clinical fields cannot be edited through any API. The backend generates unique public codes, preserves catalogue snapshots, validates brand/substitution selections, and checks expiry and dispensing state before cancellation. No dispensing or refill workflow exists yet.
+
+See [the Phase 6 report](docs/PHASE6_REPORT.md) for exact doctor/patient endpoints, sample Postman bodies, lifecycle rules, development verification prerequisites, and changed files. Existing seed doctors remain PENDING until a trusted development operator explicitly verifies a fictional fixture; this phase does not add an admin verification workflow.
 
 ## Medicine catalogue
 

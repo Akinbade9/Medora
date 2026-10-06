@@ -5,6 +5,7 @@ import { loadAuthConfig } from './auth/config.js';
 import { AuthSession, User } from './auth/models.js';
 import { initializeDomainModels } from './domain/index.js';
 import { initializeCatalogueModels } from './catalogue/models.js';
+import { Prescription } from './prescriptions/model.js';
 
 const port = Number(process.env.PORT ?? 3000);
 const host = process.env.HOST ?? '127.0.0.1';
@@ -21,6 +22,7 @@ async function start() {
     User.init(),
     AuthSession.init(),
     initializeDomainModels(),
+    Prescription.init(),
   ]);
   const server = createApp(config).listen(port, host, () => {
     console.log(`Medora API listening at http://${host}:${port}`);

@@ -8,6 +8,7 @@ import { AuthService } from './auth/service.js';
 import { authRouter } from './auth/routes.js';
 import { AuthError } from './auth/validation.js';
 import { catalogueRouter, adminCatalogueRouter } from './catalogue/routes.js';
+import { prescriptionRouter } from './prescriptions/routes.js';
 
 export function createApp(config: AuthConfig) {
   const app = express();
@@ -33,6 +34,7 @@ export function createApp(config: AuthConfig) {
   app.use('/api/auth', authRouter(new AuthService(config)));
   app.use('/api/medicines', catalogueRouter(new AuthService(config)));
   app.use('/api/admin', adminCatalogueRouter(new AuthService(config)));
+  app.use('/api', prescriptionRouter(new AuthService(config)));
 
   app.use((_req, res) => {
     res
