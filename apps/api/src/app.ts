@@ -7,6 +7,7 @@ import type { AuthConfig } from './auth/config.js';
 import { AuthService } from './auth/service.js';
 import { authRouter } from './auth/routes.js';
 import { AuthError } from './auth/validation.js';
+import { catalogueRouter, adminCatalogueRouter } from './catalogue/routes.js';
 
 export function createApp(config: AuthConfig) {
   const app = express();
@@ -19,7 +20,7 @@ export function createApp(config: AuthConfig) {
         else callback(new AuthError(403, 'Untrusted browser origin.'));
       },
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Medora-Client'],
-      methods: ['GET', 'POST', 'OPTIONS'],
+      methods: ['GET', 'POST', 'PATCH', 'OPTIONS'],
     }),
   );
   app.use(cookieParser());
@@ -30,6 +31,8 @@ export function createApp(config: AuthConfig) {
   });
 
   app.use('/api/auth', authRouter(new AuthService(config)));
+  app.use('/api/medicines', catalogueRouter(new AuthService(config)));
+  app.use('/api/admin', adminCatalogueRouter(new AuthService(config)));
 
   app.use((_req, res) => {
     res

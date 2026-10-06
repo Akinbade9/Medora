@@ -1,6 +1,6 @@
 # Medora
 
-Phases 1–4: project foundation, design system/base layouts, authentication/RBAC, and core domain models. [The Medora specification](docs/MEDORA_SPEC.md) is the source of truth. Later phases require separate implementation work.
+Phases 1–5: project foundation, design system/base layouts, authentication/RBAC, core domain models, and medicine catalogue. [The Medora specification](docs/MEDORA_SPEC.md) is the source of truth. Later phases require separate implementation work.
 
 ## Workspace
 
@@ -108,4 +108,18 @@ The seed creates `patient@medora.example.test`, `doctor@medora.example.test`, `p
 
 ## Current scope and limits
 
-Authentication/RBAC and the four core domain models are implemented. Prescriptions, medicine catalogue, inventory, matching, payments, and admin verification workflows are not implemented. Email verification, password reset, and MFA are not included. Registration still creates only a User; collecting and creating role profiles requires later workflows. Model verification statuses do not change the existing authentication rules. Mobile JavaScript bundling and Metro startup do not replace testing on a real device or emulator. No native app binaries are built in this phase.
+Authentication/RBAC, core domain models, and backend medicine catalogue are implemented. Prescriptions, inventory, matching, payments, and admin verification workflows are not implemented. Email verification, password reset, and MFA are not included. Registration still creates only a User; collecting and creating role profiles requires later workflows. Model verification statuses do not change the existing authentication rules. Mobile JavaScript bundling and Metro startup do not replace testing on a real device or emulator. No native app binaries are built in this phase.
+
+## Medicine catalogue
+
+Medicine holds a generic clinical definition; MedicineProduct holds a specific brand, manufacturer, pack size, and unique product code linked to a Medicine. Future inventory must reference MedicineProduct rather than accept arbitrary medicine names.
+
+Authenticated users can list, search, and read catalogue entries. Only platform admins can create or edit them. Pagination uses `page` (default 1) and `limit` (default 20, maximum 100). Search is literal, case-insensitive substring matching across generic name, active ingredient, and linked brand names. Both ACTIVE and INACTIVE entries are returned with explicit status. This phase provides no clinical suitability or substitution decisions.
+
+The existing `seed:dev` command now also loads catalogue examples. To load only catalogue examples without creating accounts:
+
+```powershell
+npm.cmd run seed:catalogue --workspace @medora/api
+```
+
+It requires `NODE_ENV=development` and `MONGODB_URI` in `apps/api/.env`, but no seed password. It creates three example definitions and six fictional products, preserving existing records on reruns. These examples are **software development fixtures, not a complete or authoritative drug database**. See [the Phase 5 report](docs/PHASE5_REPORT.md) for endpoint contracts, validation, verification, and the complete changed-file list.

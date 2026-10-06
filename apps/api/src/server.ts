@@ -4,6 +4,7 @@ import { createApp } from './app.js';
 import { loadAuthConfig } from './auth/config.js';
 import { AuthSession, User } from './auth/models.js';
 import { initializeDomainModels } from './domain/index.js';
+import { initializeCatalogueModels } from './catalogue/models.js';
 
 const port = Number(process.env.PORT ?? 3000);
 const host = process.env.HOST ?? '127.0.0.1';
@@ -13,7 +14,9 @@ if (!Number.isInteger(port) || port < 1 || port > 65535) {
 
 async function start() {
   const config = loadAuthConfig();
+  // Catalogue uniqueness indexes must exist before accepting requests.
   await mongoose.connect(config.mongoUri, { serverSelectionTimeoutMS: 5000 });
+  await initializeCatalogueModels();
   await Promise.all([
     User.init(),
     AuthSession.init(),

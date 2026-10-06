@@ -8,6 +8,7 @@ import { AuthScreen } from './auth/AuthScreen';
 import { useAuth } from './auth/useAuth';
 import { patientAppUrl } from './auth/client';
 import { Button, ErrorState, LoadingState } from './components/ui';
+
 function workspaceFor(user: PublicUser) {
   if (user.role === 'DOCTOR') return 'doctor';
   if (user.role === 'PHARMACY_ADMIN' || user.role === 'PHARMACY_STAFF')

@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import { seedDevelopmentData } from './seed-data.js';
+import { seedCatalogue } from '../catalogue/seed-data.js';
 
 async function main() {
   if (process.env.NODE_ENV !== 'development')
@@ -13,6 +14,10 @@ async function main() {
     throw new Error('Invalid seed password');
   await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
   await seedDevelopmentData(password, process.env.NODE_ENV);
+  await seedCatalogue(process.env.NODE_ENV);
+  console.log(
+    'Catalogue examples are for development only, not an authoritative drug database.',
+  );
   console.log(
     'Fictional development seed complete. Existing records and passwords preserved.',
   );
