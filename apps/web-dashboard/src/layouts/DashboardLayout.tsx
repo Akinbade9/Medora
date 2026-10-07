@@ -31,7 +31,8 @@ export function DashboardLayout({
   );
   const workspace = workspaces[role];
   const pageLabel =
-    workspace.items.find((item) => item.id === page)?.label ?? 'UI components';
+    workspace.items.find((item) => item.id === page)?.label ??
+    (page === 'new-prescription' ? 'New prescription' : 'UI components');
   return (
     <div className="dashboard">
       <a
@@ -62,7 +63,7 @@ export function DashboardLayout({
               className="new-prescription"
               onClick={() => {
                 setMenuOpen(false);
-                setDialog('prescription');
+                window.location.hash = '/doctor/new-prescription';
               }}
             >
               <Plus size={18} aria-hidden="true" />
@@ -98,7 +99,9 @@ export function DashboardLayout({
             UI components
           </a>
           <div className="preview-note">
-            <Badge tone="info">Layout preview</Badge>
+            <Badge tone="info">
+              {role === 'doctor' ? 'Doctor workspace' : 'Layout preview'}
+            </Badge>
             <p>A foundation for better care.</p>
           </div>
         </div>
@@ -142,7 +145,10 @@ export function DashboardLayout({
           {children}
           <footer className="workspace-footer">
             <span>Thoughtfully connected care.</span>
-            <span>Medora · Workspace preview</span>
+            <span>
+              Medora ·{' '}
+              {role === 'doctor' ? 'Doctor workspace' : 'Workspace preview'}
+            </span>
           </footer>
         </main>
       </div>

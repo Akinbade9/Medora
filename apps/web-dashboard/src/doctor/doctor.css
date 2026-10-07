@@ -1,0 +1,112 @@
+.doctor-content {
+  display: grid;
+  gap: var(--space-6);
+  max-width: 72rem;
+  margin-inline: auto;
+}
+.doctor-heading h1 {
+  font-size: var(--text-title);
+  margin-block: var(--space-2);
+}
+.doctor-heading p,
+.doctor-muted {
+  color: var(--color-muted);
+}
+.doctor-content .card {
+  padding: var(--space-6);
+  overflow-wrap: anywhere;
+}
+.doctor-content h2 {
+  font-size: var(--text-lg);
+  margin-top: 0;
+}
+.doctor-content h3 {
+  font-size: var(--text-base);
+  margin-top: 0;
+}
+.doctor-content a {
+  color: var(--color-primary-dark);
+}
+.doctor-content a.button--primary {
+  color: var(--color-card);
+}
+.doctor-search,
+.doctor-actions,
+.doctor-row,
+.doctor-pager {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+.doctor-search {
+  align-items: end;
+  margin-bottom: var(--space-6);
+}
+.doctor-search .field {
+  flex: 1;
+  min-width: 12rem;
+}
+.doctor-row {
+  justify-content: space-between;
+}
+.doctor-row h3 {
+  margin: 0;
+}
+.doctor-pager {
+  justify-content: center;
+  margin-top: var(--space-5);
+}
+.doctor-actions {
+  margin-top: var(--space-5);
+}
+.doctor-results,
+.doctor-form-grid,
+.doctor-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+.doctor-list {
+  display: grid;
+  gap: var(--space-4);
+}
+.doctor-facts {
+  margin-block: var(--space-6);
+}
+.doctor-facts dt {
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-2);
+}
+.doctor-facts dd {
+  margin: 0;
+  white-space: pre-wrap;
+}
+.doctor-medication {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.doctor-medication legend {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin-bottom: var(--space-5);
+}
+.doctor-medication > .field {
+  margin-block: var(--space-4);
+}
+@media (max-width: 700px) {
+  .doctor-results,
+  .doctor-form-grid,
+  .doctor-facts {
+    grid-template-columns: 1fr;
+  }
+  .doctor-content .card {
+    padding: var(--space-4);
+  }
+  .doctor-search > .button {
+    width: 100%;
+  }
+}

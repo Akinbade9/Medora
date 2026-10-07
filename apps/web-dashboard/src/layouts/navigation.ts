@@ -162,11 +162,13 @@ export function parseRoute(hash: string): {
   role: WorkspaceRole;
   page: string;
 } {
-  const [, candidate, page] = hash.replace(/^#/, '').split('/');
+  const [, candidate, page] = hash.replace(/^#/, '').split('?')[0]!.split('/');
   const role: WorkspaceRole =
     candidate === 'pharmacy' || candidate === 'admin' ? candidate : 'doctor';
   const workspace = workspaces[role];
   const validPage =
-    page === 'components' || workspace.items.some((item) => item.id === page);
+    page === 'components' ||
+    (role === 'doctor' && page === 'new-prescription') ||
+    workspace.items.some((item) => item.id === page);
   return { role, page: validPage && page ? page : workspace.items[0]!.id };
 }

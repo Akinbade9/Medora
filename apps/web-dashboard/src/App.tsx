@@ -8,6 +8,7 @@ import { AuthScreen } from './auth/AuthScreen';
 import { useAuth } from './auth/useAuth';
 import { patientAppUrl } from './auth/client';
 import { Button, ErrorState, LoadingState } from './components/ui';
+import { DoctorWorkspace } from './doctor/DoctorWorkspace';
 
 function workspaceFor(user: PublicUser) {
   if (user.role === 'DOCTOR') return 'doctor';
@@ -41,11 +42,11 @@ export default function App() {
     const workspace = workspaces[role];
     const title =
       workspace.items.find((item) => item.id === page)?.label ??
-      'UI components';
+      (page === 'new-prescription' ? 'New prescription' : 'UI components');
     document.title = `${title} · ${workspace.shortLabel} · Medora`;
     document.getElementById('main-content')?.focus({ preventScroll: true });
     window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [role, page]);
+  }, [role, page, hash]);
   if (auth.checking) return <LoadingState label="Checking your session…" />;
   if (auth.error)
     return (
@@ -97,6 +98,8 @@ export default function App() {
     >
       {page === 'components' ? (
         <ComponentGallery />
+      ) : role === 'doctor' ? (
+        <DoctorWorkspace key={auth.user.id} hash={hash} user={auth.user} />
       ) : (
         <WorkspaceScreen role={role} page={page} />
       )}

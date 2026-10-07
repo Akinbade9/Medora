@@ -109,3 +109,52 @@ export async function signOut() {
   }
   accessToken = null;
 }
+
+// Reuse the in-memory access token and HttpOnly refresh cookie for app APIs.
+// Retry only an explicit 401: ambiguous network failures must not reissue a prescription.
+export async function apiRequest<T>(path: string, body?: object): Promise<T> {
+  async function send() {
+    if (signingOut) throw new ApiError(401, 'Please sign in again.');
+    return fetch(`${baseUrl}/api/${path}`, {
+      method: body === undefined ? 'GET' : 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      signal: AbortSignal.timeout(15000),
+    });
+  }
+  try {
+    if (!accessToken) await refreshSession();
+    let response = await send();
+    if (response.status === 401) {
+      const account = await refreshSession();
+      window.dispatchEvent(
+        new CustomEvent('medora-session', { detail: account }),
+      );
+      response = await send();
+    }
+    const data = await response.json();
+    if (!response.ok)
+      throw new ApiError(
+        response.status,
+        data.error?.message ?? 'Unable to complete this request.',
+      );
+    return data as T;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      if (error.status === 401) {
+        accessToken = null;
+        window.dispatchEvent(new Event('medora-session-expired'));
+      }
+      throw error;
+    }
+    throw new ApiError(
+      0,
+      body
+        ? 'The result could not be confirmed. Check prescription history before trying again.'
+        : 'Cannot reach Medora. Check your connection and try again.',
+    );
+  }
+}

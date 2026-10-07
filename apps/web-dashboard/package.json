@@ -7,7 +7,9 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests playwright.config.ts --max-warnings=0",
+    "test": "playwright test"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
@@ -17,6 +19,7 @@
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/react": "~19.2.2",
     "@types/react-dom": "~19.2.0",
     "@vitejs/plugin-react": "^6.1.1",

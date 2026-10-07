@@ -1,6 +1,6 @@
 # Medora
 
-Phases 1–6: project foundation, design system/base layouts, authentication/RBAC, core domain models, medicine catalogue, and the backend prescription engine. [The Medora specification](docs/MEDORA_SPEC.md) is the source of truth. Later phases require separate implementation work.
+Phases 1–7: project foundation, design system/base layouts, authentication/RBAC, core domain models, medicine catalogue, prescription engine, and connected doctor dashboard. [The Medora specification](docs/MEDORA_SPEC.md) is the source of truth. Later phases require separate implementation work.
 
 ## Workspace
 
@@ -55,7 +55,7 @@ Supported roles are `PATIENT`, `DOCTOR`, `PHARMACY_ADMIN`, `PHARMACY_STAFF`, and
 
 Web login routes doctors to Doctor, pharmacy roles to Pharmacy, and platform admins to Admin. The old role preview selector is removed; manually changing the hash cannot select another role's layout. Patient users continue to the Expo patient app's web rendering at `VITE_PATIENT_APP_URL`. Keep the browser apps and API on the same site (including a consistent hostname and scheme) for HttpOnly cookie sessions. Native patient login opens the patient layout; professional users continue to the web dashboard and sign in there again without passing credentials in URLs.
 
-Sidebar links still open placeholder screens. **UI components** opens the component gallery. **+ New Prescription** and notifications remain preview dialogs. Hash URLs support refresh and browser back/forward within the authenticated role's workspace.
+Doctor sidebar links now open the connected Home, Patients, Prescriptions, Feedback placeholder, and Profile screens. **+ New Prescription** opens patient selection, medication entry, review, and issuance. Other role workspaces remain placeholders. **UI components** opens the component gallery; notifications remain a placeholder. Hash URLs support refresh and browser back/forward within the authenticated role's workspace.
 
 The patient app has Home, Prescriptions, Orders, and Profile bottom tabs. Notifications open from the header bell. Sign out is available in the web header and patient Profile tab. User authentication is connected; clinical screens remain placeholders.
 
@@ -108,7 +108,22 @@ The seed creates `patient@medora.example.test`, `doctor@medora.example.test`, `p
 
 ## Current scope and limits
 
-Authentication/RBAC, core domain models, backend medicine catalogue, and backend prescription issuance/viewing/cancellation are implemented. Prescription UI, inventory, matching, reservations, orders, payments, and admin verification workflows are not implemented. Email verification, password reset, and MFA are not included. Registration still creates only a User; collecting and creating role profiles requires later workflows. Doctor verification is required for prescription issuance. Mobile JavaScript bundling and Metro startup do not replace testing on a real device or emulator. No native app binaries are built in this phase.
+Authentication/RBAC, core domain models, medicine catalogue, prescription engine, and doctor prescription UI are implemented. Patient prescription UI, inventory, matching, reservations, orders, payments, and admin verification workflows are not implemented. Email verification, password reset, and MFA are not included. Registration still creates only a User; collecting and creating role profiles requires later workflows. Doctor verification is required for prescription issuance and patient search. Mobile JavaScript bundling and Metro startup do not replace testing on a real device or emulator. No native app binaries are built in this phase.
+
+## Doctor dashboard
+
+Start `npm.cmd run dev:api` and `npm.cmd run dev:web`, then sign in with a DOCTOR account. Use a verified fictional Doctor with a valid Hospital and existing Patient profiles for development (see the Phase 6 fixture instructions). Patient selection uses the Patient profile ID automatically. The existing seed keeps doctors PENDING; this phase does not change verification or seed your configured database.
+
+Search/select a patient, add active catalogue medicines and required brands, enter prescription directions, review, then issue. Details display the public code; eligible cancellation requires a reason and confirmation. Drafts stay only in memory and are discarded when leaving or refreshing. An uncertain network result disables repeat issuance and directs you to history first.
+
+For browser tests on a fresh machine:
+
+```powershell
+npm.cmd exec --workspace @medora/web-dashboard -- playwright install chromium
+npm.cmd test --workspace @medora/web-dashboard
+```
+
+The browser suite starts Vite, the real Express API, and disposable MongoDB on test ports 5299 and 3299. It does not use your configured database or account credentials. Root `npm.cmd test` now includes the browser suite. See [the Phase 7 report](docs/PHASE7_REPORT.md) for backend changes, verification, dependencies, limitations, and the full file list.
 
 ## Prescription engine
 

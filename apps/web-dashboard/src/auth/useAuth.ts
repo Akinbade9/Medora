@@ -21,6 +21,20 @@ export function useAuth() {
     }
   }, []);
   useEffect(() => {
+    const expired = () => {
+      setUser(null);
+      setError('');
+    };
+    const refreshed = (event: Event) =>
+      setUser((event as CustomEvent<PublicUser>).detail);
+    window.addEventListener('medora-session-expired', expired);
+    window.addEventListener('medora-session', refreshed);
+    return () => {
+      window.removeEventListener('medora-session-expired', expired);
+      window.removeEventListener('medora-session', refreshed);
+    };
+  }, []);
+  useEffect(() => {
     let active = true;
     currentUser()
       .then((account) => {

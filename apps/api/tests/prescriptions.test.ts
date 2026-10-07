@@ -520,3 +520,46 @@ test('historical prescriptions retain snapshots after catalogue deactivation and
   assert.equal(viewed.body.medications[0].strength, 5);
   await cancel(created.body._id).expect(200);
 });
+
+test('doctor patient search exposes only valid profile summaries and enforces verified doctor access', async () => {
+  await request(app).get('/api/doctor/patients?q=Fictional').expect(401);
+  await auth(
+    'get',
+    'doctor/patients?q=Fictional',
+    patientAuth.accessToken,
+  ).expect(403);
+  const result = await auth(
+    'get',
+    'doctor/patients?q=Fictional&limit=1',
+  ).expect(200);
+  assert.equal(result.body.total, 2);
+  assert.equal(result.body.items.length, 1);
+  assert.deepEqual(Object.keys(result.body.items[0]).sort(), [
+    '_id',
+    'dateOfBirth',
+    'displayName',
+    'patientCode',
+  ]);
+  assert.notEqual(result.body.items[0]._id, patientAuth.user.id);
+  await auth('get', `doctor/patients/${input.patientId}`).expect(200);
+  await auth('get', `doctor/patients/${new mongoose.Types.ObjectId()}`).expect(
+    404,
+  );
+  await auth('get', 'doctor/patients?q=x').expect(400);
+  assert.equal(
+    (await auth('get', 'doctor/patients?q=.*').expect(200)).body.total,
+    0,
+  );
+  const profile = await auth('get', 'doctor/profile').expect(200);
+  assert.equal(profile.body.canIssue, true);
+  assert.equal(profile.body.hospital.name, 'Fictional hospital');
+  const doctor = await Doctor.findById(doctorId).orFail();
+  doctor.verificationStatus = 'PENDING';
+  await doctor.save();
+  await auth('get', 'doctor/patients?q=Fictional').expect(403);
+  await auth('get', `doctor/patients/${input.patientId}`).expect(403);
+  assert.equal(
+    (await auth('get', 'doctor/profile').expect(200)).body.canIssue,
+    false,
+  );
+});
